@@ -11,12 +11,18 @@ const initialItems = [
 
 
 function App() {
+  const [items, setItems] = useState([]);
+
+  function handleAddItem(item){
+    setItems((prevItems) => [...prevItems, item]);
+  }
+
   return (
     <div className="App">
       <Logo />
-      <Form />
-      <ParkingList />
-      <Stats />
+      <Form  onAddItem={handleAddItem} />
+      <ParkingList items={items} />
+      <Stats items={items} />
     </div>
   );
 }
@@ -28,7 +34,7 @@ function Logo(){
     </div>
   )
 }
-function Form(){
+function Form({onAddItem}){
   const [description, setDescription] = useState('');
   const [quantity, setQuantity] = useState(1);
   
@@ -44,6 +50,7 @@ function Form(){
       packed: false,
     }
     console.log(newItem);
+    onAddItem(newItem);
 
     setDescription('');
     setQuantity(1);
@@ -64,11 +71,11 @@ function Form(){
     </form>
   )
 }
-function ParkingList(){
+function ParkingList({items}){
   return(
     <div className='list'>
     <ul>
-      {initialItems.map((item) => (
+      {items.map((item) => (
         <Item key={item.id} item={item} />
       ))}
     </ul>
@@ -87,12 +94,15 @@ function Item({item}){
   )
 }
 
+function Stats({items}){
+  const numItems = items.length;
+  const numPacked = items.filter((item) => item.packed).length;
+  const percentage = Math.round(numPacked / numItems * 100);
 
-function Stats(){
   return(
     <footer className='stats'>
       <em>
-        💼you have x item on your list and you have already parked x (x%)
+        💼you have {numItems} item on your list and you have already parked {numPacked} ({percentage}%)
       </em>
     </footer>
   )
