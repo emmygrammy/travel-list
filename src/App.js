@@ -16,12 +16,15 @@ function App() {
   function handleAddItem(item){
     setItems((prevItems) => [...prevItems, item]);
   }
+  function handleDeleteItem(id){
+    setItems((prevItems) => prevItems.filter((item) => item.id !== id));
+  }
 
   return (
     <div className="App">
       <Logo />
       <Form  onAddItem={handleAddItem} />
-      <ParkingList items={items} />
+      <ParkingList items={items} onDeleteItem={handleDeleteItem} />
       <Stats items={items} />
     </div>
   );
@@ -71,25 +74,25 @@ function Form({onAddItem}){
     </form>
   )
 }
-function ParkingList({items}){
+function ParkingList({items, onDeleteItem}){
   return(
     <div className='list'>
     <ul>
       {items.map((item) => (
-        <Item key={item.id} item={item} />
+        <Item key={item.id} item={item} onDeleteItem={onDeleteItem} />
       ))}
     </ul>
       </div>
   )
 }
 
-function Item({item}){
+function Item({item, onDeleteItem}){
   return(
     <li>
       <span style={{textDecoration: item.packed ? 'line-through' : 'none'}}>
         {item.quantity} {item.description}
         </span>
-      <button>❌</button>
+      <button onClick={() => onDeleteItem(item.id)}>❌</button>
     </li>
   )
 }
