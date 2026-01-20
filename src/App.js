@@ -23,14 +23,19 @@ function App() {
   function handleToggleItem(id){
     setItems((prevItems) => prevItems.map((item) => item.id === id ? {...item, packed: !item.packed} : item));
   }
-
+  function handleClearItems(){
+    const confirmed = window.confirm('Are you sure you want to clear all items?');
+    if (confirmed) setItems([]);
+  }
   return (
     <div className="App">
       <Logo />
       <Form  onAddItem={handleAddItem} />
       <ParkingList items={items} 
       onDeleteItem={handleDeleteItem} 
-      onToggleItem={handleToggleItem} />
+      onToggleItem={handleToggleItem}
+      onClearItems={handleClearItems}
+      />
       <Stats items={items} />
     </div>
   );
@@ -80,14 +85,14 @@ function Form({onAddItem}){
     </form>
   )
 }
-function ParkingList({items, onDeleteItem, onToggleItem}){
-  const [filteredItems, setFilteredItems] = useState(items);
+function ParkingList({items, onDeleteItem, onToggleItem, onClearItems }){
+ 
   const [filter, setFilter] = useState('all');
-  setFilteredItems(items.filter((item) => {
+  const filteredItems = items.filter((item) => {
     if (filter === 'all') return true;
     if (filter === 'packed') return item.packed;
     if (filter === 'unpacked') return !item.packed;
-  }))
+  })
   return(
     <div className='list'>
     <ul>
@@ -107,7 +112,7 @@ function ParkingList({items, onDeleteItem, onToggleItem}){
 
      </div>
     <div className='clear'>
-      <button onClick={() => setItems([])}>Clear all</button>
+      <button onClick={() => onClearItems()}>Clear all</button>
     </div>
 
     </div>
