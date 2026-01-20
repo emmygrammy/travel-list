@@ -20,11 +20,17 @@ function App() {
     setItems((prevItems) => prevItems.filter((item) => item.id !== id));
   }
 
+  function handleToggleItem(id){
+    setItems((prevItems) => prevItems.map((item) => item.id === id ? {...item, packed: !item.packed} : item));
+  }
+
   return (
     <div className="App">
       <Logo />
       <Form  onAddItem={handleAddItem} />
-      <ParkingList items={items} onDeleteItem={handleDeleteItem} />
+      <ParkingList items={items} 
+      onDeleteItem={handleDeleteItem} 
+      onToggleItem={handleToggleItem} />
       <Stats items={items} />
     </div>
   );
@@ -74,21 +80,44 @@ function Form({onAddItem}){
     </form>
   )
 }
-function ParkingList({items, onDeleteItem}){
+function ParkingList({items, onDeleteItem, onToggleItem}){
+  const [filteredItems, setFilteredItems] = useState(items);
+  const [filter, setFilter] = useState('all');
+  setFilteredItems(items.filter((item) => {
+    if (filter === 'all') return true;
+    if (filter === 'packed') return item.packed;
+    if (filter === 'unpacked') return !item.packed;
+  }))
   return(
     <div className='list'>
     <ul>
-      {items.map((item) => (
-        <Item key={item.id} item={item} onDeleteItem={onDeleteItem} />
+      {filteredItems.map((item) => (
+        <Item key={item.id} item={item} 
+        onDeleteItem={onDeleteItem} 
+        onToggleItem={onToggleItem} />
       ))}
     </ul>
-      </div>
+
+     <div>
+      <select>
+        <option value='all'>All</option>
+        <option value='packed'>Packed</option>
+        <option value='unpacked'>Unpacked</option>
+      </select>
+
+     </div>
+    <div className='clear'>
+      <button onClick={() => setItems([])}>Clear all</button>
+    </div>
+
+    </div>
   )
 }
 
-function Item({item, onDeleteItem}){
+function Item({item, onDeleteItem, onToggleItem}){
   return(
     <li>
+      <input type='checkbox' checked={item.packed} onChange={() => onToggleItem(item.id)} />
       <span style={{textDecoration: item.packed ? 'line-through' : 'none'}}>
         {item.quantity} {item.description}
         </span>
@@ -105,7 +134,9 @@ function Stats({items}){
   return(
     <footer className='stats'>
       <em>
-        💼you have {numItems} item on your list and you have already parked {numPacked} ({percentage}%)
+        {numItems === 0 ?
+         'No items, please start parking your items' : `you have ${numItems} item on your list and you have already parked ${numPacked} (${percentage}%)`
+         }
       </em>
     </footer>
   )
